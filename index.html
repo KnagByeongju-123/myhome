@@ -99,13 +99,8 @@
 <body>
 
     <header>
-        <nav class="nav-container">
-            <a class="nav-link active" data-target="content-ga">가</a>
-            <a class="nav-link" data-target="content-na">나</a>
-            <a class="nav-link" data-target="content-da">다</a>
-            <a class="nav-link" data-target="content-la">라</a>
-            <a class="nav-link" data-target="content-ma">마</a>
-            <a class="nav-link" data-target="content-ba">바</a>
+        <nav class="nav-container" id="nav-container">
+            <!-- 메뉴는 JavaScript로 동적 생성됩니다 -->
         </nav>
     </header>
 
@@ -153,8 +148,40 @@
     <script>
         /* --- JavaScript 동작 영역 --- */
 
+        // 메뉴 데이터 정의 (쉽게 수정/추가/삭제 가능)
+        const menuData = [
+            { label: '가', target: 'content-ga' },
+            { label: '나', target: 'content-na' },
+            { label: '다', target: 'content-da' },
+            { label: '라', target: 'content-la' },
+            { label: '마', target: 'content-ma' },
+            { label: '바', target: 'content-ba' }
+        ];
+
+        // 동적으로 메뉴 생성하는 함수
+        function createNavigationMenu() {
+            const navContainer = document.getElementById('nav-container');
+
+            menuData.forEach((menu, index) => {
+                const link = document.createElement('a');
+                link.className = 'nav-link';
+                link.setAttribute('data-target', menu.target);
+                link.textContent = menu.label;
+
+                // 첫 번째 메뉴는 기본 활성화
+                if (index === 0) {
+                    link.classList.add('active');
+                }
+
+                navContainer.appendChild(link);
+            });
+        }
+
         // 문서가 로드되면 실행
         document.addEventListener('DOMContentLoaded', () => {
+            // 메뉴 동적 생성
+            createNavigationMenu();
+
             const navLinks = document.querySelectorAll('.nav-link');
             const contents = document.querySelectorAll('.content-section');
 
@@ -175,7 +202,7 @@
                     contents.forEach(content => content.classList.remove('show'));
                     // 5. 해당하는 콘텐츠 섹션만 보여주기
                     document.getElementById(targetId).classList.add('show');
-                    
+
                     // (선택사항) 메뉴 클릭 시 부드럽게 상단으로 스크롤 이동
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
