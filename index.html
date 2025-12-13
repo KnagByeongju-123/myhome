@@ -8,9 +8,23 @@
         /* --- CSS 스타일 영역 --- */
         
         /* 기본 초기화 */
+        :root {
+            --primary-color: #3b82f6; /* 메인 파란색 */
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --header-height: 60px;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; line-height: 1.6; color: #333; }
+        body { 
+            font-family: 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif; 
+            line-height: 1.6; 
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            padding-top: var(--header-height); /* 헤더 높이만큼 여백 */
+        }
         a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
 
         /* 상단 고정 헤더 */
         header {
@@ -18,196 +32,361 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 60px; /* 헤더 높이 */
-            background-color: #222; /* 어두운 배경 */
-            color: white;
+            height: var(--header-height);
+            background-color: #ffffff;
+            border-bottom: 1px solid #ddd;
             z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* 상단 네비게이션바 (모바일 가로 스크롤 지원) */
+        .header-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        /* 네비게이션바 */
         .nav-container {
             display: flex;
-            align-items: center;
-            height: 100%;
-            overflow-x: auto; /* 메뉴가 많으면 가로 스크롤 */
-            -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
-            white-space: nowrap; /* 줄바꿈 방지 */
+            gap: 20px;
         }
-        /* 스크롤바 숨기기 (선택사항) */
-        .nav-container::-webkit-scrollbar { display: none; }
-        .nav-container { -ms-overflow-style: none; scrollbar-width: none; }
 
-
-        /* 메뉴 링크 스타일 */
         .nav-link {
-            display: inline-block;
-            padding: 0 25px;
-            height: 60px;
-            line-height: 60px;
-            font-size: 1.1rem;
-            font-weight: 500;
-            transition: background-color 0.3s, color 0.3s;
+            padding: 8px 12px;
+            border-radius: 4px;
             cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            color: #666;
         }
 
         .nav-link:hover {
-            background-color: #444;
+            background-color: #f0f0f0;
+            color: var(--primary-color);
         }
 
-        /* 활성화된 메뉴 스타일 */
         .nav-link.active {
-            background-color: #007bff; /* 활성 포인트 컬러 (파랑) */
+            color: var(--primary-color);
             font-weight: bold;
+            background-color: #eff6ff;
         }
 
-        /* 하단 메인 콘텐츠 영역 */
-        main {
-            /* 헤더 높이만큼 상단 여백을 줘서 내용이 가려지지 않게 함 */
-            padding-top: 60px; 
-            min-height: 100vh;
-            background-color: #f4f4f4;
-        }
-
-        /* 개별 콘텐츠 섹션 스타일 */
-        .content-section {
-            display: none; /* 기본적으로 모든 섹션을 숨김 */
-            padding: 30px 20px;
-            max-width: 800px;
+        /* 콘텐츠 섹션 공통 */
+        .main-container {
+            max-width: 1000px;
             margin: 0 auto;
-            background: white;
-            min-height: calc(100vh - 60px);
+            padding: 40px 20px;
+            min-height: calc(100vh - var(--header-height));
         }
 
-        /* 활성화된 섹션만 보이게 함 */
+        .content-section {
+            display: none; /* 기본적으로 숨김 */
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
         .content-section.show {
-            display: block;
-            animation: fadeIn 0.5s ease-in-out; /* 부드러운 전환 효과 */
+            display: block; /* 활성화된 섹션만 보임 */
         }
-        
-        h2 { margin-bottom: 20px; color: #222; border-bottom: 2px solid #eee; padding-bottom: 10px;}
-        p { margin-bottom: 15px; }
 
-        /* 페이드인 애니메이션 정의 */
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #111;
+            border-bottom: 2px solid var(--primary-color);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        /* --- 게시판 스타일 --- */
+        .board-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .board-table th, .board-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .board-table th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .board-table tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .post-title {
+            color: #1f2937;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .post-title:hover {
+            text-decoration: underline;
+            color: var(--primary-color);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            background-color: #e2e8f0;
+            color: #475569;
+            margin-right: 5px;
+        }
+
+        /* --- 갤러리 스타일 (Grid) --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .gallery-item {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .gallery-item:hover { transform: translateY(-5px); }
+        .gallery-placeholder {
+            width: 100%;
+            height: 150px;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+        }
+        .gallery-caption { padding: 10px; font-size: 0.9rem; text-align: center; }
+
+        /* 모바일 대응 */
+        @media (max-width: 600px) {
+            .header-inner { flex-direction: column; height: auto; padding: 10px; }
+            header { height: auto; position: relative; } /* 모바일에서는 고정 해제하거나 높이 조정 */
+            body { padding-top: 0; }
+            .nav-container { margin-top: 10px; width: 100%; overflow-x: auto; padding-bottom: 5px; }
+            .board-table th:nth-child(4), /* 작성일 */
+            .board-table th:nth-child(5) { /* 조회수 */
+                display: none; 
+            }
+            .board-table td:nth-child(4), 
+            .board-table td:nth-child(5) { 
+                display: none; 
+            }
+        }
     </style>
 </head>
 <body>
 
+    <!-- 헤더 영역 -->
     <header>
-        <nav class="nav-container" id="nav-container">
-            <!-- 메뉴는 JavaScript로 동적 생성됩니다 -->
-        </nav>
+        <div class="header-inner">
+            <div class="logo">My Home</div>
+            <nav class="nav-container" id="nav-menu">
+                <!-- 자바스크립트로 메뉴가 생성됩니다 -->
+            </nav>
+        </div>
     </header>
 
-    <main id="main-content">
-        <section id="content-ga" class="content-section show">
-            <h2>'가' 메뉴의 공간입니다.</h2>
-            <p>이곳은 '가' 메뉴를 클릭했을 때 보여지는 첫 번째 화면입니다.</p>
-            <p>모바일 환경을 고려하여 상단 메뉴는 고정되어 있고, 내용이 길어지면 이 영역만 스크롤됩니다.</p>
-            <p>내용을 자유롭게 수정해보세요.</p>
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="main-container">
+        
+        <!-- 1. 홈 섹션 -->
+        <section id="home" class="content-section show">
+            <h2>안녕하세요! 👋</h2>
+            <p>나의 개인 홈페이지에 오신 것을 환영합니다.</p>
+            <p style="margin-top: 10px;">
+                이 페이지는 <strong>HTML, CSS, JavaScript</strong>만으로 구성된 단일 파일 웹페이지입니다.<br>
+                상단 메뉴를 클릭하여 다른 페이지로 이동해보세요.
+            </p>
+            <div style="margin-top: 30px; padding: 20px; background: white; border-radius: 8px; border-left: 4px solid var(--primary-color); box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                <h3>📌 최근 업데이트</h3>
+                <ul style="margin-top: 10px; padding-left: 20px; list-style: disc;">
+                    <li>게시판 데이터 연동 (Mock Data 적용)</li>
+                    <li>모바일 반응형 디자인 개선</li>
+                    <li>갤러리 그리드 레이아웃 추가</li>
+                </ul>
+            </div>
         </section>
 
-        <section id="content-na" class="content-section">
-            <h2>'나' 메뉴의 소개</h2>
-            <p>두 번째 메뉴 화면입니다. 페이지가 새로고침 되지 않고 내용만 부드럽게 바뀝니다.</p>
-            <p>GitHub Pages를 이용하면 무료로 이 정적 웹사이트를 호스팅할 수 있습니다.</p>
+        <!-- 2. 프로필 섹션 -->
+        <section id="profile" class="content-section">
+            <h2>프로필</h2>
+            <div style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+                <div style="width: 120px; height: 120px; background-color: #ddd; border-radius: 50%; flex-shrink: 0; display:flex; align-items:center; justify-content:center;">
+                    이미지
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 10px;">홍길동 (Hong Gil-Dong)</h3>
+                    <p>웹 개발을 공부하고 있는 열정적인 개발자입니다.</p>
+                    <p>Email: user@example.com</p>
+                    <p>Github: github.com/user</p>
+                </div>
+            </div>
         </section>
 
-        <section id="content-da" class="content-section">
-            <h2>'다' 메뉴 - 포트폴리오</h2>
-            <p>여기에 이미지나 프로젝트 경험을 넣어 포트폴리오로 활용할 수 있습니다.</p>
-            <ul>
-                <li>프로젝트 A</li>
-                <li>프로젝트 B</li>
-                <li>프로젝트 C</li>
-            </ul>
+        <!-- 3. 게시판 섹션 (CSV 데이터 구조 반영) -->
+        <section id="board" class="content-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>자유 게시판</h2>
+                <button onclick="alert('글쓰기 기능은 준비중입니다.')" style="padding: 8px 16px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;">글쓰기</button>
+            </div>
+            
+            <table class="board-table">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">번호</th>
+                        <th>제목</th>
+                        <th style="width: 100px;">작성자</th>
+                        <th style="width: 120px;">작성일시</th>
+                        <th style="width: 80px;">조회수</th>
+                    </tr>
+                </thead>
+                <tbody id="board-list-body">
+                    <!-- 자바스크립트로 데이터가 로드됩니다 -->
+                </tbody>
+            </table>
         </section>
 
-        <section id="content-la" class="content-section">
-            <h2>'라' 메뉴 - 연락처</h2>
-            <p>이메일: example@github.com</p>
-            <p>GitHub: https://github.com/username</p>
+        <!-- 4. 갤러리 섹션 -->
+        <section id="gallery" class="content-section">
+            <h2>갤러리</h2>
+            <div class="gallery-grid">
+                <!-- 예시 아이템 반복 -->
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">사진 1</div>
+                    <div class="gallery-caption">여행 사진</div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">사진 2</div>
+                    <div class="gallery-caption">맛집 탐방</div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">사진 3</div>
+                    <div class="gallery-caption">코딩 풍경</div>
+                </div>
+            </div>
         </section>
 
-         <section id="content-ma" class="content-section">
-            <h2>'마' 메뉴 - 기타</h2>
-            <p>다섯 번째 메뉴 공간입니다. 필요한 정보를 자유롭게 추가하세요.</p>
-        </section>
-
-         <section id="content-ba" class="content-section">
-            <h2>'바' 메뉴 - 마지막</h2>
-            <p>마지막 메뉴입니다. 상단 네비게이션 바는 메뉴가 많아지면 모바일에서 좌우로 스크롤할 수 있습니다.</p>
-        </section>
-    </main>
+    </div>
 
     <script>
-        /* --- JavaScript 동작 영역 --- */
-
-        // 메뉴 데이터 정의 (쉽게 수정/추가/삭제 가능)
-        const menuData = [
-            { label: '가', target: 'content-ga' },
-            { label: '나', target: 'content-na' },
-            { label: '다', target: 'content-da' },
-            { label: '라', target: 'content-la' },
-            { label: '마', target: 'content-ma' },
-            { label: '바', target: 'content-ba' }
+        // --- 1. 설정 및 데이터 (CSV 파일 내용을 가상의 데이터로 구현) ---
+        const menuItems = [
+            { id: 'home', label: '홈' },
+            { id: 'profile', label: '프로필' },
+            { id: 'board', label: '게시판' },
+            { id: 'gallery', label: '갤러리' }
         ];
 
-        // 동적으로 메뉴 생성하는 함수
+        // 업로드해주신 '게시글.csv'의 헤더(번호,제목,내용,작성자...)를 기반으로 한 가상 데이터
+        const boardData = [
+            { no: 105, title: '홈페이지 개설했습니다!', author: '홍길동', date: '2025-12-13', views: 24, comments: 2 },
+            { no: 104, title: '구글 스프레드시트 연동 질문', author: '김철수', date: '2025-12-12', views: 15, comments: 0 },
+            { no: 103, title: '텔레그램 봇 만들기 꿀팁 공유', author: '이영희', date: '2025-12-10', views: 56, comments: 5 },
+            { no: 102, title: '오늘 점심 메뉴 추천받습니다', author: '박민수', date: '2025-12-09', views: 12, comments: 1 },
+            { no: 101, title: '가입 인사 드립니다.', author: '최지훈', date: '2025-12-01', views: 8, comments: 0 }
+        ];
+
+        // --- 2. 기능 구현 ---
+
+        // 네비게이션 메뉴 생성 함수
         function createNavigationMenu() {
-            const navContainer = document.getElementById('nav-container');
-
-            menuData.forEach((menu, index) => {
+            const navContainer = document.getElementById('nav-menu');
+            
+            menuItems.forEach((item, index) => {
                 const link = document.createElement('a');
+                link.textContent = item.label;
                 link.className = 'nav-link';
-                link.setAttribute('data-target', menu.target);
-                link.textContent = menu.label;
+                link.setAttribute('data-target', item.id);
+                link.href = '#';
 
-                // 첫 번째 메뉴는 기본 활성화
-                if (index === 0) {
-                    link.classList.add('active');
-                }
+                // 첫 번째 메뉴 기본 활성화
+                if (index === 0) link.classList.add('active');
+
+                // 클릭 이벤트
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    handleMenuClick(link, item.id);
+                });
 
                 navContainer.appendChild(link);
             });
         }
 
-        // 문서가 로드되면 실행
-        document.addEventListener('DOMContentLoaded', () => {
-            // 메뉴 동적 생성
-            createNavigationMenu();
+        // 메뉴 클릭 처리 함수
+        function handleMenuClick(clickedLink, targetId) {
+            // 1. 모든 메뉴 활성 상태 제거
+            document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+            // 2. 클릭한 메뉴 활성화
+            clickedLink.classList.add('active');
 
-            const navLinks = document.querySelectorAll('.nav-link');
-            const contents = document.querySelectorAll('.content-section');
+            // 3. 모든 섹션 숨기기
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('show'));
+            // 4. 대상 섹션 보여주기
+            document.getElementById(targetId).classList.add('show');
+            
+            // 5. 모바일 등에서 스크롤 상단 이동 (부드럽게)
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-            // 각 메뉴 링크에 클릭 이벤트 리스너 추가
-            navLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault(); // 링크 기본 이동 동작 막기
+        // 게시판 목록 렌더링 함수
+        function renderBoard() {
+            const tbody = document.getElementById('board-list-body');
+            tbody.innerHTML = ''; // 초기화
 
-                    // 1. 모든 메뉴의 활성 상태 제거
-                    navLinks.forEach(nav => nav.classList.remove('active'));
-                    // 2. 클릭한 메뉴만 활성화
-                    link.classList.add('active');
+            boardData.forEach(post => {
+                const tr = document.createElement('tr');
+                
+                // 댓글 수 뱃지 표시 로직
+                const commentBadge = post.comments > 0 
+                    ? `<span style="color:red; font-size:0.8em; margin-left:4px;">[${post.comments}]</span>` 
+                    : '';
 
-                    // 3. 보여줄 대상 콘텐츠 ID 가져오기
-                    const targetId = link.getAttribute('data-target');
-
-                    // 4. 모든 콘텐츠 섹션 숨기기
-                    contents.forEach(content => content.classList.remove('show'));
-                    // 5. 해당하는 콘텐츠 섹션만 보여주기
-                    document.getElementById(targetId).classList.add('show');
-
-                    // (선택사항) 메뉴 클릭 시 부드럽게 상단으로 스크롤 이동
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
+                tr.innerHTML = `
+                    <td style="text-align: center; color: #666;">${post.no}</td>
+                    <td>
+                        <span class="post-title" onclick="alert('${post.title} 내용 보기')">${post.title}</span>
+                        ${commentBadge}
+                    </td>
+                    <td style="text-align: center;">${post.author}</td>
+                    <td style="text-align: center; color: #888;">${post.date}</td>
+                    <td style="text-align: center; color: #888;">${post.views}</td>
+                `;
+                tbody.appendChild(tr);
             });
+        }
+
+        // --- 3. 초기화 실행 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            createNavigationMenu(); // 메뉴 생성
+            renderBoard();          // 게시판 데이터 로드
         });
+
     </script>
 </body>
 </html>
