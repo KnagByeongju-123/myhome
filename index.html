@@ -101,6 +101,7 @@
         .gallery-item {
             background: white; border-radius: 8px; overflow: hidden;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: transform 0.2s;
+            cursor: pointer; /* 클릭 가능 표시 */
         }
         .gallery-item:hover { transform: translateY(-5px); }
         .gallery-img-box {
@@ -169,7 +170,7 @@
                 </ul>
             </div>
             <p style="margin-top:20px; color:#666; font-size:0.9rem;">
-                * 데이터를 불러오는 데 시간이 조금 걸릴 수 있습니다 (구글 무료 서버 특성).
+                * 갤러리 업로드 암호는 <strong>8877</strong> 입니다.
             </p>
         </section>
 
@@ -215,7 +216,7 @@
                 <h2>드라이브 갤러리</h2>
                 <button class="btn-primary" onclick="openGalleryModal()">📷 사진 업로드</button>
             </div>
-            <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">* 구글 드라이브 폴더의 이미지를 불러옵니다.</p>
+            <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">* 사진을 클릭하면 <strong>다운로드</strong> 됩니다.</p>
             <div class="gallery-grid" id="gallery-container">
                 <p style="grid-column: 1/-1; text-align: center;">갤러리 로딩 중...</p>
             </div>
@@ -259,17 +260,29 @@
         </div>
     </div>
 
-    <!-- 사진 업로드 모달 -->
+    <!-- 사진 업로드 모달 (수정됨: 제목, 비밀번호 추가) -->
     <div id="modal-gallery" class="modal-overlay">
         <div class="modal-box">
             <button class="modal-close" onclick="closeModal('modal-gallery')">&times;</button>
             <div class="modal-header">구글 드라이브 업로드</div>
-            <p style="font-size:0.85rem; color:#666; margin-bottom:10px;">* 업로드 시 구글 드라이브 폴더에 저장됩니다.</p>
+            
+            <div class="form-group">
+                <label class="form-label">비밀번호 (필수)</label>
+                <input type="password" id="input-img-pw" class="form-input" placeholder="업로드 비밀번호(8877) 입력">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">이미지 제목 (선택)</label>
+                <input type="text" id="input-img-title" class="form-input" placeholder="원하는 제목을 입력하세요">
+                <p style="font-size:0.8rem; color:#888;">* 입력 안 하면 파일명으로 저장됩니다.</p>
+            </div>
+
             <div class="form-group">
                 <label class="form-label">이미지 파일 선택</label>
                 <input type="file" id="input-img-file" class="form-input" accept="image/*">
             </div>
-            <button class="btn-primary" style="width: 100%;" onclick="uploadImage()" id="btn-upload-img">업로드 (시간 소요됨)</button>
+
+            <button class="btn-primary" style="width: 100%;" onclick="uploadImage()" id="btn-upload-img">업로드</button>
         </div>
     </div>
 
@@ -320,9 +333,6 @@
 
             document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('show'));
             document.getElementById(targetId).classList.add('show');
-
-            // 게시판이나 갤러리 탭을 누르면 최신 데이터 다시 불러오기 (선택사항)
-            // if (targetId === 'board' || targetId === 'gallery') fetchAllData(); 
         }
 
         // 3. 데이터 불러오기 (API 통신)
@@ -408,8 +418,6 @@
             btn.textContent = '저장 중...';
 
             try {
-                // POST 요청 보내기
-                // 주의: 구글 앱스 스크립트 웹앱은 CORS 정책상 text/plain으로 보내는 것이 안전할 때가 많음
                 await fetch(APP_API_URL, {
                     method: 'POST',
                     body: JSON.stringify({ 
@@ -422,12 +430,8 @@
 
                 alert('게시글이 저장되었습니다!');
                 closeModal('modal-write');
-                
-                // 입력창 초기화
                 document.getElementById('input-title').value = '';
                 document.getElementById('input-content').value = '';
-                
-                // 목록 갱신
                 fetchAllData(); 
 
             } catch(e) {
@@ -447,7 +451,7 @@
             document.getElementById('modal-view').classList.add('open');
         }
 
-        // 5. 갤러리 기능
+        // 5. 갤러리 기능 (수정됨: 다운로드 링크 추가)
         function renderGallery() {
             const container = document.getElementById('gallery-container');
             container.innerHTML = '';
@@ -458,39 +462,63 @@
             }
 
             galleryItems.forEach(item => {
+                // 다운로드 링크 생성 (export=download 파라미터 사용)
+                // item.id가 존재한다고 가정 (백엔드에서 보내줌)
+                let downloadLink = "#";
+                if(item.id) {
+                    downloadLink = `https://drive.google.com/uc?export=download&id=${item.id}`;
+                }
+
                 const div = document.createElement('div');
                 div.className = 'gallery-item';
+                // 이미지를 클릭하면 다운로드 링크로 이동 (새 탭 권장하지 않음, 다운로드 유도)
                 div.innerHTML = `
-                    <div class="gallery-img-box">
+                    <a href="${downloadLink}" class="gallery-img-box" title="클릭하여 다운로드">
                         <img src="${item.url}" alt="${item.caption}" loading="lazy" onerror="this.src='https://via.placeholder.com/300?text=No+Image'">
-                    </div>
+                    </a>
                     <div class="gallery-caption">${item.caption}</div>
                 `;
                 container.appendChild(div);
             });
         }
 
+        // 6. 이미지 업로드 (수정됨: 비밀번호 확인 & 제목 변경)
         async function uploadImage() {
+            // 1. 비밀번호 확인
+            const pw = document.getElementById('input-img-pw').value;
+            if (pw !== '8877') {
+                alert('비밀번호가 틀렸습니다. (힌트: 8877)');
+                return;
+            }
+
             const fileInput = document.getElementById('input-img-file');
             if (fileInput.files.length === 0) return alert('파일을 선택해주세요.');
             
             const file = fileInput.files[0];
-            const btn = document.getElementById('btn-upload-img');
             
+            // 2. 파일명 결정 (제목 입력했으면 그것으로 교체, 확장자 유지)
+            let fileName = file.name;
+            const customTitle = document.getElementById('input-img-title').value.trim();
+            if (customTitle) {
+                const ext = file.name.split('.').pop(); // 확장자 추출
+                fileName = `${customTitle}.${ext}`;
+            }
+
+            const btn = document.getElementById('btn-upload-img');
             btn.disabled = true; 
             btn.textContent = '업로드 중... (잠시만 기다려주세요)';
 
             // 파일을 Base64로 변환
             const reader = new FileReader();
             reader.onload = async function(e) {
-                const base64Data = e.target.result; // "data:image/png;base64,..." 형태
+                const base64Data = e.target.result;
                 
                 try {
                     await fetch(APP_API_URL, {
                         method: 'POST',
                         body: JSON.stringify({
                             action: 'uploadImage',
-                            fileName: file.name,
+                            fileName: fileName, // 변경된 이름 전송
                             mimeType: file.type,
                             fileData: base64Data
                         })
@@ -498,14 +526,19 @@
 
                     alert('업로드 완료! 갤러리가 곧 갱신됩니다.');
                     closeModal('modal-gallery');
-                    fileInput.value = ''; // 초기화
+                    
+                    // 입력창 초기화
+                    fileInput.value = '';
+                    document.getElementById('input-img-pw').value = '';
+                    document.getElementById('input-img-title').value = '';
+                    
                     fetchAllData();
 
                 } catch(err) {
                     alert('업로드 실패: ' + err.message);
                 } finally {
                     btn.disabled = false; 
-                    btn.textContent = '업로드 (시간 소요됨)';
+                    btn.textContent = '업로드';
                 }
             };
             reader.readAsDataURL(file);
