@@ -3,154 +3,623 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나의 홈페이지</title>
+    <title>만물상</title>
     <style>
-        :root { --primary: #03c75a; --bg: #f5f6f7; --text: #333; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Apple SD Gothic Neo', sans-serif; margin: 0; background: var(--bg); color: var(--text); }
+        :root { 
+            --primary: #03c75a; 
+            --secondary: #ff6b6b;
+            --bg: #f5f6f7; 
+            --text: #333; 
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg); color: var(--text); }
 
         /* [네비게이션] */
-        header { background: white; padding: 0 20px; height: 60px; display: flex; align-items: center; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .logo { font-weight: bold; font-size: 1.2rem; margin-right: auto; color: var(--primary); }
-        .nav-link { margin-left: 20px; cursor: pointer; color: #666; font-weight: bold; padding: 18px 0; border-bottom: 3px solid transparent; transition: 0.3s; }
-        .nav-link:hover, .nav-link.active { color: var(--primary); border-bottom-color: var(--primary); }
+        header { 
+            background: white; 
+            padding: 0 20px; 
+            height: 60px; 
+            display: flex; 
+            align-items: center; 
+            border-bottom: 1px solid #ddd; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+        }
+        .logo { 
+            font-weight: 900; 
+            font-size: 1.4rem; 
+            margin-right: auto; 
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            cursor: pointer;
+            letter-spacing: -0.5px;
+        }
+        .nav-link { 
+            margin-left: 20px; 
+            cursor: pointer; 
+            color: #666; 
+            font-weight: 600; 
+            padding: 18px 0; 
+            border-bottom: 3px solid transparent; 
+            transition: all 0.3s; 
+            font-size: 0.95rem;
+        }
+        .nav-link:hover, .nav-link.active { 
+            color: var(--primary); 
+            border-bottom-color: var(--primary); 
+        }
+
+        /* [홈 화면 히어로 섹션] */
+        .hero {
+            background: var(--gradient);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: move 20s linear infinite;
+        }
+        @keyframes move {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: -2px;
+        }
+        .hero p {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .hero-btn {
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .hero-btn.primary {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .hero-btn.primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        .hero-btn.secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+        .hero-btn.secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* [기능 카드] */
+        .features {
+            max-width: 1200px;
+            margin: -60px auto 60px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+        .feature-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        .feature-icon {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* [통계 섹션] */
+        .stats {
+            background: white;
+            padding: 60px 20px;
+            margin: 60px 0;
+        }
+        .stats-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+        .stat-item {
+            padding: 20px;
+        }
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
 
         /* [레이아웃] */
-        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; min-height: 80vh; }
-        .section { display: none; animation: fadeIn 0.3s; }
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; min-height: 60vh; }
+        .section { display: none; animation: fadeIn 0.4s; }
         .section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
 
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .btn { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
-        .btn:hover { opacity: 0.9; }
+        .page-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            padding-bottom: 15px;
+            border-bottom: 3px solid #eee;
+        }
+        .page-header h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+        .btn { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 0.95rem; 
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(3, 199, 90, 0.3);
+        }
+        .btn:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(3, 199, 90, 0.4);
+        }
 
         /* [게시판 스타일] */
-        .board-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .board-table th { background: #f9f9f9; padding: 12px; text-align: left; font-weight: 600; border-bottom: 1px solid #eee; }
-        .board-table td { padding: 12px; border-bottom: 1px solid #eee; }
-        .board-table tr:hover { background: #f8f8f8; cursor: pointer; }
-        .col-no { width: 60px; text-align: center; }
-        .col-date { width: 120px; color: #888; font-size: 0.9rem; text-align: center; }
+        .board-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            background: white; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); 
+        }
+        .board-table th { 
+            background: #fafafa; 
+            padding: 15px 12px; 
+            text-align: left; 
+            font-weight: 700; 
+            border-bottom: 2px solid #eee; 
+            color: #555;
+        }
+        .board-table td { 
+            padding: 15px 12px; 
+            border-bottom: 1px solid #f5f5f5; 
+        }
+        .board-table tr:hover { 
+            background: #f8fffe; 
+            cursor: pointer; 
+        }
+        .col-no { width: 70px; text-align: center; font-weight: 600; color: #999; }
+        .col-date { width: 130px; color: #888; font-size: 0.9rem; text-align: center; }
 
         /* [블로그 스타일] */
-        .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .blog-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: 0.3s; cursor: pointer; display: flex; flex-direction: column; }
-        .blog-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
-        .blog-thumb { height: 180px; background: #eee; overflow: hidden; }
-        .blog-thumb img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .blog-card:hover .blog-thumb img { transform: scale(1.05); }
-        .blog-info { padding: 15px; flex: 1; display: flex; flex-direction: column; }
-        .blog-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; color: #333; }
-        .blog-meta { margin-top: auto; font-size: 0.85rem; color: #999; }
+        .blog-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 25px; 
+        }
+        .blog-card { 
+            background: white; 
+            border-radius: 16px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+            transition: all 0.3s; 
+            cursor: pointer; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .blog-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15); 
+        }
+        .blog-thumb { 
+            height: 200px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            overflow: hidden; 
+        }
+        .blog-thumb img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            transition: 0.5s; 
+        }
+        .blog-card:hover .blog-thumb img { 
+            transform: scale(1.1); 
+        }
+        .blog-info { 
+            padding: 20px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .blog-title { 
+            font-weight: 700; 
+            font-size: 1.2rem; 
+            margin-bottom: 10px; 
+            color: #333; 
+            line-height: 1.4;
+        }
+        .blog-meta { 
+            margin-top: auto; 
+            font-size: 0.85rem; 
+            color: #999; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
         /* [입력폼/상세보기] */
-        .write-box, .view-box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
-        .form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
-        textarea.form-control { height: 150px; resize: vertical; }
+        .write-box, .view-box { 
+            background: white; 
+            padding: 35px; 
+            border-radius: 16px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+        }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 700; 
+            color: #555; 
+            font-size: 0.95rem;
+        }
+        .form-control { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid #e5e5e5; 
+            border-radius: 8px; 
+            font-size: 1rem; 
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(3, 199, 90, 0.1);
+        }
+        textarea.form-control { 
+            height: 180px; 
+            resize: vertical; 
+            line-height: 1.6;
+        }
         
-        .blog-section { border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 10px; background: #fafafa; }
+        .blog-section { 
+            border: 2px dashed #ddd; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            background: #fafafa; 
+            transition: all 0.3s;
+        }
+        .blog-section:hover {
+            border-color: var(--primary);
+            background: #f5fff9;
+        }
         
-        .view-content img { max-width: 100%; border-radius: 8px; margin: 15px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .view-content p { line-height: 1.7; white-space: pre-wrap; margin-bottom: 20px; }
-        .view-header { border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+        .view-content img { 
+            max-width: 100%; 
+            border-radius: 12px; 
+            margin: 20px 0; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+        }
+        .view-content p { 
+            line-height: 1.8; 
+            white-space: pre-wrap; 
+            margin-bottom: 25px; 
+            font-size: 1.05rem;
+            color: #444;
+        }
+        .view-header { 
+            border-bottom: 3px solid #eee; 
+            padding-bottom: 20px; 
+            margin-bottom: 30px; 
+        }
+        .view-header h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            line-height: 1.3;
+        }
 
         /* 로딩바 */
-        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--primary), #60a5fa); z-index: 999; display: none; }
+        #loading { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 4px; 
+            background: var(--gradient); 
+            z-index: 9999; 
+            display: none; 
+            animation: loading 1.5s ease-in-out infinite;
+        }
+        @keyframes loading {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        /* 푸터 */
+        footer {
+            background: #2d3436;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 80px;
+        }
+        footer p {
+            opacity: 0.8;
+            margin: 5px 0;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .hero p { font-size: 1.1rem; }
+            .features { margin-top: -40px; }
+            .feature-grid { grid-template-columns: 1fr; }
+            .stats-container { grid-template-columns: repeat(2, 1fr); }
+            .nav-link { margin-left: 15px; font-size: 0.9rem; }
+        }
     </style>
 </head>
 <body>
     <div id="loading"></div>
 
     <header>
-        <div class="logo">My Home</div>
-        <div class="nav-link active" onclick="switchTab('board')">📝 자유 게시판</div>
-        <div class="nav-link" onclick="switchTab('blog')">✈️ 여행 블로그</div>
+        <div class="logo" onclick="switchTab('home')">🏔️ 만물상</div>
+        <div class="nav-link" onclick="switchTab('home')">🏠 홈</div>
+        <div class="nav-link" onclick="switchTab('board')">📝 자유게시판</div>
+        <div class="nav-link" onclick="switchTab('blog')">✈️ 여행블로그</div>
     </header>
 
+    <div id="sec-home" class="section active">
+        <!-- 히어로 섹션 -->
+        <div class="hero">
+            <div class="hero-content">
+                <h1>만물상</h1>
+                <p>세상의 모든 이야기가 모이는 곳<br>자유롭게 소통하고, 특별한 순간을 공유하세요</p>
+                <div class="hero-buttons">
+                    <button class="hero-btn primary" onclick="switchTab('board')">게시판 둘러보기</button>
+                    <button class="hero-btn secondary" onclick="switchTab('blog')">여행 기록 보기</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 기능 카드 -->
+        <div class="features">
+            <div class="feature-grid">
+                <div class="feature-card" onclick="switchTab('board')">
+                    <span class="feature-icon">💬</span>
+                    <h3>자유 게시판</h3>
+                    <p>일상의 이야기부터 전문 지식까지, 자유롭게 소통하는 공간입니다</p>
+                </div>
+                <div class="feature-card" onclick="switchTab('blog')">
+                    <span class="feature-icon">🌍</span>
+                    <h3>여행 블로그</h3>
+                    <p>특별했던 여행의 순간을 사진과 함께 기록하고 공유하세요</p>
+                </div>
+                <div class="feature-card" onclick="alert('준비 중인 기능입니다!')">
+                    <span class="feature-icon">📚</span>
+                    <h3>지식 공유</h3>
+                    <p>배움과 성장의 이야기를 나누는 커뮤니티 (Coming Soon)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 통계 섹션 -->
+        <div class="stats">
+            <div class="stats-container">
+                <div class="stat-item">
+                    <div class="stat-number" id="stat-posts">0</div>
+                    <div class="stat-label">전체 게시글</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="stat-blogs">0</div>
+                    <div class="stat-label">여행 기록</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">365</div>
+                    <div class="stat-label">활동 일수</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
-        
-        <div id="sec-board" class="section active">
+        <!-- 게시판 섹션 -->
+        <div id="sec-board" class="section">
             <div class="page-header">
-                <h2>자유 게시판</h2>
-                <button class="btn" onclick="showWrite('board')">글쓰기</button>
+                <h2>📝 자유 게시판</h2>
+                <button class="btn" onclick="showWrite('board')">✍️ 글쓰기</button>
             </div>
             <table class="board-table">
-                <thead><tr><th class="col-no">No</th><th>제목</th><th>작성자</th><th class="col-date">날짜</th></tr></thead>
-                <tbody id="board-list"><tr><td colspan="4" style="text-align:center; padding:20px;">로딩 중...</td></tr></tbody>
+                <thead>
+                    <tr>
+                        <th class="col-no">No</th>
+                        <th>제목</th>
+                        <th>작성자</th>
+                        <th class="col-date">날짜</th>
+                    </tr>
+                </thead>
+                <tbody id="board-list">
+                    <tr><td colspan="4" style="text-align:center; padding:40px;">로딩 중...</td></tr>
+                </tbody>
             </table>
         </div>
 
+        <!-- 블로그 섹션 -->
         <div id="sec-blog" class="section">
             <div class="page-header">
-                <h2>나의 여행 기록</h2>
+                <h2>✈️ 여행 블로그</h2>
                 <button class="btn" onclick="showWrite('blog')">📷 여행기 작성</button>
             </div>
             <div id="blog-list" class="blog-grid">
-                <p>로딩 중...</p>
+                <p style="padding:40px; text-align:center;">로딩 중...</p>
             </div>
         </div>
 
+        <!-- 글쓰기 섹션 -->
         <div id="sec-write" class="section">
             <div class="page-header">
                 <h2 id="write-title">글쓰기</h2>
-                <button class="btn" style="background:#888" onclick="history.back()">취소</button>
+                <button class="btn" style="background:#888" onclick="cancelWrite()">취소</button>
             </div>
             <div class="write-box">
                 <input type="hidden" id="write-type">
                 <div class="input-group">
+                    <label>제목</label>
                     <input type="text" id="w-title" class="form-control" placeholder="제목을 입력하세요">
                 </div>
                 <div class="input-group">
+                    <label>작성자</label>
                     <input type="text" id="w-author" class="form-control" placeholder="작성자 이름">
                 </div>
 
                 <div id="editor-board">
-                    <textarea id="w-content" class="form-control" placeholder="내용을 자유롭게 적어주세요."></textarea>
+                    <div class="input-group">
+                        <label>내용</label>
+                        <textarea id="w-content" class="form-control" placeholder="내용을 자유롭게 적어주세요."></textarea>
+                    </div>
                 </div>
 
                 <div id="editor-blog" style="display:none;">
                     <div id="blog-sections-area"></div>
-                    <button onclick="addBlogSection()" style="width:100%; padding:10px; background:white; border:2px dashed #ccc; color:#666; cursor:pointer; margin-bottom:20px;">+ 사진 및 내용 추가</button>
+                    <button onclick="addBlogSection()" style="width:100%; padding:15px; background:white; border:2px dashed #ccc; color:#666; cursor:pointer; margin-bottom:20px; border-radius:8px; font-weight:600;">+ 사진 및 내용 추가</button>
                 </div>
 
-                <button class="btn" onclick="submitPost()" style="width:100%; margin-top:20px;">등록하기</button>
+                <button class="btn" onclick="submitPost()" style="width:100%; margin-top:20px; padding:15px; font-size:1.1rem;">📮 등록하기</button>
             </div>
         </div>
 
+        <!-- 상세보기 섹션 -->
         <div id="sec-view" class="section">
             <div class="page-header">
+                <h2>게시글</h2>
                 <button class="btn" style="background:#888" onclick="closeView()">← 목록으로</button>
             </div>
             <div class="view-box">
                 <div class="view-header">
                     <h2 id="v-title">제목</h2>
-                    <div id="v-meta" style="color:#888;">작성자 | 날짜</div>
+                    <div id="v-meta" style="color:#888; margin-top:10px;">작성자 | 날짜</div>
                 </div>
                 <div id="v-body" class="view-content">내용</div>
             </div>
         </div>
     </div>
 
+    <footer>
+        <p><strong>🏔️ 만물상</strong></p>
+        <p>세상의 모든 이야기가 모이는 곳</p>
+        <p style="margin-top:15px; font-size:0.85rem;">© 2024 Manmoolsang. All rights reserved.</p>
+    </footer>
+
     <script>
-        // ★★★ 본인의 배포 URL을 넣어주세요 ★★★
         const API_URL = "https://script.google.com/macros/s/AKfycbyOjYEtAlCm8drpFjoIfNanRaJfHWdWkS3nQHmXLXGVQivqaNWz776NqfpVB4B4jGlH9A/exec";
 
         let boardData = [];
         let blogData = [];
 
-        window.onload = function() { switchTab('board'); };
+        window.onload = function() { 
+            switchTab('home');
+            updateStats();
+        };
 
         function switchTab(type) {
+            // 네비게이션 활성화
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-            if(event && event.target) event.target.classList.add('active');
-            else document.querySelector('.nav-link').classList.add('active');
+            const links = document.querySelectorAll('.nav-link');
+            if(type === 'home') links[0].classList.add('active');
+            if(type === 'board') links[1].classList.add('active');
+            if(type === 'blog') links[2].classList.add('active');
             
+            // 섹션 전환
             showSection('sec-' + type);
+            
+            // 데이터 로드
             if(type === 'board') loadBoard();
             if(type === 'blog') loadBlog();
+            
+            // 맨 위로 스크롤
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function showSection(id) {
@@ -164,7 +633,11 @@
                 const res = await fetch(API_URL + "?action=getPosts&t=" + Date.now());
                 boardData = await res.json();
                 renderBoardList();
-            } catch(e) { console.error(e); }
+                updateStats();
+            } catch(e) { 
+                console.error(e); 
+                document.getElementById('board-list').innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color:#ff6b6b;">데이터를 불러올 수 없습니다.</td></tr>';
+            }
             document.getElementById('loading').style.display = 'none';
         }
 
@@ -174,27 +647,57 @@
                 const res = await fetch(API_URL + "?action=getBlog&t=" + Date.now());
                 blogData = await res.json();
                 renderBlogList();
-            } catch(e) { console.error(e); }
+                updateStats();
+            } catch(e) { 
+                console.error(e); 
+                document.getElementById('blog-list').innerHTML = '<p style="padding:40px; text-align:center; color:#ff6b6b;">데이터를 불러올 수 없습니다.</p>';
+            }
             document.getElementById('loading').style.display = 'none';
+        }
+
+        function updateStats() {
+            document.getElementById('stat-posts').innerText = boardData.length;
+            document.getElementById('stat-blogs').innerText = blogData.length;
         }
 
         function renderBoardList() {
             const tbody = document.getElementById('board-list');
-            if(boardData.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">게시글이 없습니다.</td></tr>'; return; }
+            if(boardData.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:40px; color:#999;">📭 아직 게시글이 없습니다.<br><br><button class="btn" onclick="showWrite(\'board\')">첫 글 작성하기</button></td></tr>'; 
+                return; 
+            }
             let html = '';
             boardData.forEach((item, idx) => {
-                html += `<tr onclick="viewPost('board', ${idx})"><td class="col-no">${item.no}</td><td>${item.title}</td><td>${item.author}</td><td class="col-date">${item.date}</td></tr>`;
+                html += `<tr onclick="viewPost('board', ${idx})">
+                    <td class="col-no">${item.no}</td>
+                    <td><strong>${item.title}</strong></td>
+                    <td>${item.author}</td>
+                    <td class="col-date">${item.date}</td>
+                </tr>`;
             });
             tbody.innerHTML = html;
         }
 
         function renderBlogList() {
             const container = document.getElementById('blog-list');
-            if(blogData.length === 0) { container.innerHTML = '<p style="padding:20px;">작성된 여행기가 없습니다.</p>'; return; }
+            if(blogData.length === 0) { 
+                container.innerHTML = '<div style="grid-column:1/-1; padding:60px 20px; text-align:center; color:#999;"><span style="font-size:4rem; display:block; margin-bottom:20px;">🗺️</span><p style="font-size:1.1rem; margin-bottom:20px;">아직 여행 기록이 없습니다</p><button class="btn" onclick="showWrite(\'blog\')">첫 여행기 작성하기</button></div>'; 
+                return; 
+            }
             let html = '';
             blogData.forEach((item, idx) => {
-                const thumb = item.thumbnail || 'https://via.placeholder.com/300x200?text=No+Image';
-                html += `<div class="blog-card" onclick="viewPost('blog', ${idx})"><div class="blog-thumb"><img src="${thumb}"></div><div class="blog-info"><div class="blog-title">${item.title}</div><div class="blog-meta">${item.date} · ${item.author}</div></div></div>`;
+                const thumb = item.thumbnail || 'https://via.placeholder.com/400x300/667eea/ffffff?text=No+Image';
+                html += `<div class="blog-card" onclick="viewPost('blog', ${idx})">
+                    <div class="blog-thumb"><img src="${thumb}" alt="${item.title}"></div>
+                    <div class="blog-info">
+                        <div class="blog-title">${item.title}</div>
+                        <div class="blog-meta">
+                            <span>✍️ ${item.author}</span>
+                            <span>•</span>
+                            <span>📅 ${item.date}</span>
+                        </div>
+                    </div>
+                </div>`;
             });
             container.innerHTML = html;
         }
@@ -207,11 +710,11 @@
             document.getElementById('blog-sections-area').innerHTML = '';
             
             if(type === 'board') {
-                document.getElementById('write-title').innerText = "자유 게시판 글쓰기";
+                document.getElementById('write-title').innerText = "📝 자유 게시판 글쓰기";
                 document.getElementById('editor-board').style.display = 'block';
                 document.getElementById('editor-blog').style.display = 'none';
             } else {
-                document.getElementById('write-title').innerText = "여행 기록 남기기";
+                document.getElementById('write-title').innerText = "✈️ 여행 기록 남기기";
                 document.getElementById('editor-board').style.display = 'none';
                 document.getElementById('editor-blog').style.display = 'block';
                 addBlogSection();
@@ -219,55 +722,85 @@
             showSection('sec-write');
         }
 
+        function cancelWrite() {
+            if(confirm('작성 중인 내용이 사라집니다. 취소하시겠습니까?')) {
+                const type = document.getElementById('write-type').value;
+                switchTab(type);
+            }
+        }
+
         function addBlogSection() {
             const div = document.createElement('div');
             div.className = 'blog-section';
-            div.innerHTML = `<div style="margin-bottom:5px; font-weight:bold;">📷 사진 및 설명</div><input type="file" class="form-control" accept="image/*" style="margin-bottom:5px;"><textarea class="form-control" placeholder="사진에 대한 설명을 적어주세요." style="height:80px;"></textarea><button onclick="this.parentElement.remove()" style="float:right; margin-top:5px; border:none; background:none; color:red; cursor:pointer;">삭제</button><div style="clear:both;"></div>`;
+            div.innerHTML = `
+                <div style="margin-bottom:10px; font-weight:bold; color:#555;">📷 사진 및 설명</div>
+                <div class="input-group">
+                    <input type="file" class="form-control" accept="image/*" style="margin-bottom:10px;">
+                </div>
+                <div class="input-group">
+                    <textarea class="form-control" placeholder="사진에 대한 설명을 적어주세요." style="height:100px;"></textarea>
+                </div>
+                <button onclick="this.parentElement.remove()" style="float:right; margin-top:5px; border:none; background:none; color:#ff6b6b; cursor:pointer; font-weight:600;">🗑️ 삭제</button>
+                <div style="clear:both;"></div>
+            `;
             document.getElementById('blog-sections-area').appendChild(div);
         }
 
-        // ★★★ [글 저장하기: 파일명 변경 로직 포함] ★★★
         async function submitPost() {
             const type = document.getElementById('write-type').value;
-            const title = document.getElementById('w-title').value;
-            const author = document.getElementById('w-author').value;
+            const title = document.getElementById('w-title').value.trim();
+            const author = document.getElementById('w-author').value.trim();
             
-            if(!title || !author) return alert("제목과 작성자를 입력해주세요.");
-            document.getElementById('loading').style.display = 'block';
+            if(!title || !author) {
+                alert("⚠️ 제목과 작성자를 입력해주세요.");
+                return;
+            }
 
+            document.getElementById('loading').style.display = 'block';
             let payload = { title: title, author: author };
 
             if(type === 'board') {
+                const content = document.getElementById('w-content').value.trim();
+                if(!content) {
+                    alert("⚠️ 내용을 입력해주세요.");
+                    document.getElementById('loading').style.display = 'none';
+                    return;
+                }
                 payload.action = 'savePost';
-                payload.content = document.getElementById('w-content').value;
+                payload.content = content;
                 await sendData(payload);
             } else {
                 const sections = document.querySelectorAll('.blog-section');
                 let contentList = [];
                 let firstThumb = "";
-                let imgCount = 1; // 이미지 번호 매기기용
+                let imgCount = 1;
 
                 for(let sec of sections) {
                     const fileInput = sec.querySelector('input[type=file]');
-                    const text = sec.querySelector('textarea').value;
+                    const text = sec.querySelector('textarea').value.trim();
                     let imgUrl = "";
 
                     if(fileInput.files.length > 0) {
                         try {
-                            // ★ 핵심: 파일명을 "제목_1.jpg", "제목_2.jpg"로 생성
                             const originalFile = fileInput.files[0];
-                            const newFileName = `${title}_${imgCount}.jpg`; 
-                            
-                            // 변경된 이름을 uploadFile 함수로 전달
+                            const newFileName = `${title}_${imgCount}.jpg`;
                             imgUrl = await uploadFile(originalFile, newFileName);
-                            
                             if(!firstThumb) firstThumb = imgUrl;
-                            imgCount++; 
-                        } catch(e) { console.error(e); }
+                            imgCount++;
+                        } catch(e) { 
+                            console.error(e); 
+                            alert("이미지 업로드 중 오류가 발생했습니다.");
+                        }
                     }
                     if(imgUrl || text) {
                         contentList.push({ imgUrl: imgUrl, text: text });
                     }
+                }
+
+                if(contentList.length === 0) {
+                    alert("⚠️ 최소 하나 이상의 사진 또는 내용을 추가해주세요.");
+                    document.getElementById('loading').style.display = 'none';
+                    return;
                 }
 
                 payload.action = 'saveBlog';
@@ -279,18 +812,29 @@
 
         async function sendData(data) {
             try {
-                await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
-                alert("등록되었습니다!");
-                switchTab(document.getElementById('write-type').value);
-            } catch(e) { alert("오류 발생: " + e); } 
-            finally { document.getElementById('loading').style.display = 'none'; }
+                const res = await fetch(API_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify(data) 
+                });
+                const result = await res.json();
+                
+                if(result.success) {
+                    alert("✅ 등록되었습니다!");
+                    switchTab(document.getElementById('write-type').value);
+                } else {
+                    alert("❌ 등록 실패: " + (result.message || "알 수 없는 오류"));
+                }
+            } catch(e) { 
+                alert("❌ 오류 발생: " + e); 
+            } finally { 
+                document.getElementById('loading').style.display = 'none'; 
+            }
         }
 
-        // ★★★ [이미지 압축 및 이름 변경 업로드] ★★★
         function uploadFile(file, newName) {
             return new Promise((resolve, reject) => {
-                const MAX_WIDTH = 1024; 
-                const QUALITY = 0.7;    
+                const MAX_WIDTH = 1024;
+                const QUALITY = 0.7;
 
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -313,12 +857,11 @@
                         ctx.drawImage(img, 0, 0, width, height);
                         const compressedDataUrl = canvas.toDataURL('image/jpeg', QUALITY);
 
-                        // 압축된 데이터 전송 (newName 사용)
                         fetch(API_URL, {
                             method: 'POST',
                             body: JSON.stringify({
                                 action: 'uploadImage',
-                                fileName: newName || file.name, // ★ 여기서 바뀐 이름 전송
+                                fileName: newName || file.name,
                                 mimeType: 'image/jpeg',
                                 fileData: compressedDataUrl
                             })
@@ -326,7 +869,7 @@
                         .then(res => res.json())
                         .then(json => {
                             if(json.success) resolve(json.url);
-                            else reject(json.message);
+                            else reject(json.message || "업로드 실패");
                         })
                         .catch(err => reject(err));
                     }
@@ -337,7 +880,7 @@
         function viewPost(type, idx) {
             const data = (type === 'board') ? boardData[idx] : blogData[idx];
             document.getElementById('v-title').innerText = data.title;
-            document.getElementById('v-meta').innerText = `작성자: ${data.author} | 날짜: ${data.date}`;
+            document.getElementById('v-meta').innerText = `✍️ ${data.author} | 📅 ${data.date}`;
             const body = document.getElementById('v-body');
             
             if(type === 'board') {
@@ -347,18 +890,20 @@
                 try { sections = JSON.parse(data.content); } catch(e) { sections = [{text: data.content}]; }
                 let html = '';
                 sections.forEach(sec => {
-                    if(sec.imgUrl) html += `<img src="${sec.imgUrl}">`;
+                    if(sec.imgUrl) html += `<img src="${sec.imgUrl}" alt="여행 사진">`;
                     if(sec.text) html += `<p>${sec.text}</p>`;
                 });
                 body.innerHTML = html;
             }
             showSection('sec-view');
-            window.scrollTo(0,0);
+            window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
         function closeView() {
-            const currentTab = document.querySelector('.nav-link.active').innerText.includes('게시판') ? 'board' : 'blog';
-            showSection('sec-' + currentTab);
+            const currentTab = document.querySelector('.nav-link.active');
+            if(currentTab.innerText.includes('게시판')) switchTab('board');
+            else if(currentTab.innerText.includes('블로그')) switchTab('blog');
+            else switchTab('home');
         }
     </script>
 </body>
