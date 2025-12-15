@@ -3,285 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>나의 여행 블로그</title>
+    <title>나의 홈페이지</title>
     <style>
-        :root { --primary: #03c75a; /* 네이버 블로그 느낌 */ --bg: #f5f6f7; }
+        :root { --primary: #03c75a; --bg: #f5f6f7; --text: #333; }
         * { box-sizing: border-box; }
-        body { font-family: 'Apple SD Gothic Neo', sans-serif; margin: 0; background: var(--bg); padding-bottom: 50px; }
+        body { font-family: 'Apple SD Gothic Neo', sans-serif; margin: 0; background: var(--bg); color: var(--text); }
 
-        /* 헤더 */
-        header { background: white; padding: 15px; text-align: center; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 99; }
-        .nav-btn { background: none; border: none; font-size: 1rem; margin: 0 10px; cursor: pointer; color: #666; font-weight: bold; }
-        .nav-btn.active { color: var(--primary); border-bottom: 2px solid var(--primary); }
+        /* [네비게이션 헤더] */
+        header { background: white; padding: 0 20px; height: 60px; display: flex; align-items: center; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .logo { font-weight: bold; font-size: 1.2rem; margin-right: auto; color: var(--primary); }
+        .nav-link { margin-left: 20px; cursor: pointer; color: #666; font-weight: bold; padding: 18px 0; border-bottom: 3px solid transparent; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-        /* 컨테이너 */
-        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
-        .page { display: none; }
-        .page.active { display: block; }
+        /* [공통 레이아웃] */
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; min-height: 80vh; }
+        .section { display: none; animation: fadeIn 0.3s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 버튼 스타일 */
-        .btn-main { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; width: 100%; margin-bottom: 20px; }
-        .btn-sub { background: white; border: 1px solid #ccc; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
+        .btn:hover { opacity: 0.9; }
 
-        /* [블로그 리스트] 카드형 디자인 */
-        .blog-card { background: white; border-radius: 8px; margin-bottom: 20px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); cursor: pointer; }
-        .blog-thumb { height: 200px; background: #eee; overflow: hidden; }
-        .blog-thumb img { width: 100%; height: 100%; object-fit: cover; transition: 0.3s; }
+        /* ---------------------------------------------------
+           [탭 1] 자유 게시판 스타일 (표 형태)
+        --------------------------------------------------- */
+        .board-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .board-table th { background: #f9f9f9; padding: 12px; text-align: left; font-weight: 600; border-bottom: 1px solid #eee; }
+        .board-table td { padding: 12px; border-bottom: 1px solid #eee; }
+        .board-table tr:hover { background: #f8f8f8; cursor: pointer; }
+        .col-no { width: 60px; text-align: center; }
+        .col-date { width: 120px; color: #888; font-size: 0.9rem; text-align: center; }
+
+        /* ---------------------------------------------------
+           [탭 2] 여행 블로그 스타일 (카드 형태)
+        --------------------------------------------------- */
+        .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .blog-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: 0.3s; cursor: pointer; display: flex; flex-direction: column; }
+        .blog-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
+        .blog-thumb { height: 180px; background: #eee; overflow: hidden; }
+        .blog-thumb img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .blog-card:hover .blog-thumb img { transform: scale(1.05); }
-        .blog-info { padding: 20px; }
-        .blog-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; color: #333; }
-        .blog-date { color: #888; font-size: 0.9rem; }
+        .blog-info { padding: 15px; flex: 1; display: flex; flex-direction: column; }
+        .blog-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; color: #333; }
+        .blog-meta { margin-top: auto; font-size: 0.85rem; color: #999; }
 
-        /* [글쓰기 화면] 동적 입력 폼 */
-        .write-section { background: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #eee; }
-        .write-section h4 { margin: 0 0 10px 0; color: #555; }
-        textarea { width: 100%; height: 80px; padding: 10px; border: 1px solid #ddd; border-radius: 4px; resize: vertical; margin-top: 5px; }
-        .file-input { margin-bottom: 5px; width: 100%; }
+        /* [글쓰기/상세보기 화면 공통] */
+        .write-box, .view-box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        .form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
+        textarea.form-control { height: 150px; resize: vertical; }
         
-        /* [상세 보기 화면] */
-        .view-container { background: white; padding: 30px; border-radius: 8px; min-height: 80vh; }
-        .view-title { font-size: 1.8rem; font-weight: bold; margin-bottom: 10px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
-        .view-content img { max-width: 100%; border-radius: 5px; margin: 20px 0 10px 0; display: block; }
-        .view-content p { line-height: 1.8; color: #333; font-size: 1.05rem; white-space: pre-wrap; margin-bottom: 30px; }
-        .back-btn { display: inline-block; margin-bottom: 20px; color: #666; cursor: pointer; }
+        /* 블로그 글쓰기 전용 (동적 추가 영역) */
+        .blog-section { border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 10px; background: #fafafa; }
+        
+        /* 상세 보기 내용 */
+        .view-content img { max-width: 100%; border-radius: 8px; margin: 15px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .view-content p { line-height: 1.7; white-space: pre-wrap; margin-bottom: 20px; }
+        .view-header { border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
 
-        /* 로딩 오버레이 */
-        #loader { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; text-align: center; color: white; padding-top: 200px; font-size: 1.5rem; }
+        /* 로딩바 */
+        #loading { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--primary), #60a5fa); z-index: 999; display: none; }
     </style>
 </head>
 <body>
+    <div id="loading"></div>
 
     <header>
-        <button class="nav-btn active" onclick="goPage('list')">✈️ 여행기 목록</button>
-        <button class="nav-btn" onclick="goPage('write')">✏️ 글쓰기</button>
+        <div class="logo">My Home</div>
+        <div class="nav-link active" onclick="switchTab('board')">📝 자유 게시판</div>
+        <div class="nav-link" onclick="switchTab('blog')">✈️ 여행 블로그</div>
     </header>
 
     <div class="container">
         
-        <div id="page-list" class="page active">
-            <div id="blog-list-container">
-                <p style="text-align:center; padding: 50px;">데이터를 불러오는 중...</p>
+        <div id="sec-board" class="section active">
+            <div class="page-header">
+                <h2>자유 게시판</h2>
+                <button class="btn" onclick="showWrite('board')">글쓰기</button>
+            </div>
+            <table class="board-table">
+                <thead><tr><th class="col-no">No</th><th>제목</th><th>작성자</th><th class="col-date">날짜</th></tr></thead>
+                <tbody id="board-list"><tr><td colspan="4" style="text-align:center; padding:20px;">로딩 중...</td></tr></tbody>
+            </table>
+        </div>
+
+        <div id="sec-blog" class="section">
+            <div class="page-header">
+                <h2>나의 여행 기록</h2>
+                <button class="btn" onclick="showWrite('blog')">📷 여행기 작성</button>
+            </div>
+            <div id="blog-list" class="blog-grid">
+                <p>로딩 중...</p>
             </div>
         </div>
 
-        <div id="page-write" class="page">
-            <div style="background:white; padding:20px; border-radius:8px;">
-                <input id="w-title" type="text" placeholder="제목을 입력하세요" style="width:100%; padding:10px; font-size:1.2rem; border:1px solid #ddd; margin-bottom:20px;">
-                <input id="w-author" type="text" placeholder="작성자" style="width:100%; padding:10px; margin-bottom:20px; border:1px solid #ddd;">
-                
-                <div id="editor-area">
-                    </div>
+        <div id="sec-write" class="section">
+            <div class="page-header">
+                <h2 id="write-title">글쓰기</h2>
+                <button class="btn" style="background:#888" onclick="history.back()">취소</button>
+            </div>
+            <div class="write-box">
+                <input type="hidden" id="write-type"> <div class="input-group">
+                    <input type="text" id="w-title" class="form-control" placeholder="제목을 입력하세요">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="w-author" class="form-control" placeholder="작성자 이름">
+                </div>
 
-                <button class="btn-sub" onclick="addSection()" style="width:100%; padding: 15px; border: 2px dashed #ccc; color:#666; margin-bottom: 20px;">
-                    + 사진 및 내용 추가하기 (클릭)
-                </button>
+                <div id="editor-board">
+                    <textarea id="w-content" class="form-control" placeholder="내용을 자유롭게 적어주세요."></textarea>
+                </div>
 
-                <button class="btn-main" onclick="saveBlog()">발행하기</button>
+                <div id="editor-blog" style="display:none;">
+                    <div id="blog-sections-area"></div>
+                    <button onclick="addBlogSection()" style="width:100%; padding:10px; background:white; border:2px dashed #ccc; color:#666; cursor:pointer; margin-bottom:20px;">+ 사진 및 내용 추가</button>
+                </div>
+
+                <button class="btn" onclick="submitPost()" style="width:100%; margin-top:20px;">등록하기</button>
             </div>
         </div>
 
-        <div id="page-view" class="page">
-            <div class="back-btn" onclick="goPage('list')">← 목록으로 돌아가기</div>
-            <div class="view-container">
-                <div id="v-title" class="view-title">제목</div>
-                <div id="v-info" style="color:#888; margin-bottom:30px;">작성자 | 날짜</div>
-                <div id="v-body" class="view-content">
-                    </div>
+        <div id="sec-view" class="section">
+            <div class="page-header">
+                <button class="btn" style="background:#888" onclick="closeView()">← 목록으로</button>
+            </div>
+            <div class="view-box">
+                <div class="view-header">
+                    <h2 id="v-title">제목</h2>
+                    <div id="v-meta" style="color:#888;">작성자 | 날짜</div>
+                </div>
+                <div id="v-body" class="view-content">내용</div>
             </div>
         </div>
 
     </div>
 
-    <div id="loader">저장 중입니다...<br>사진이 많으면 시간이 걸릴 수 있습니다.</div>
-
     <script>
-        // ★★★ 배포된 앱스 스크립트 주소를 여기에 넣으세요 ★★★
+        // ★★★ 배포 주소 확인 (Code.gs는 그대로 두셨으면 주소도 그대로입니다) ★★★
         const API_URL = "https://script.google.com/macros/s/AKfycbyOjYEtAlCm8drpFjoIfNanRaJfHWdWkS3nQHmXLXGVQivqaNWz776NqfpVB4B4jGlH9A/exec";
 
+        let boardData = [];
         let blogData = [];
 
+        // 초기 로드
         window.onload = function() {
-            loadList();
-            addSection(); // 처음에 입력칸 하나 만들어주기
+            switchTab('board'); // 기본은 게시판
         };
 
-        function goPage(pageName) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + pageName).classList.add('active');
+        // 탭 전환
+        function switchTab(type) {
+            // 메뉴 스타일 활성화
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            event && event.target ? event.target.classList.add('active') : document.querySelector('.nav-link').classList.add('active');
             
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            if(pageName === 'list') document.querySelector('.nav-btn:nth-child(1)').classList.add('active');
-            if(pageName === 'write') document.querySelector('.nav-btn:nth-child(2)').classList.add('active');
+            // 섹션 표시
+            showSection('sec-' + type);
+            
+            // 데이터 로드
+            if(type === 'board') loadBoard();
+            if(type === 'blog') loadBlog();
         }
 
-        // --- [목록 기능] ---
-        async function loadList() {
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // --- 데이터 불러오기 ---
+        async function loadBoard() {
+            document.getElementById('loading').style.display = 'block';
+            try {
+                const res = await fetch(API_URL + "?action=getPosts");
+                boardData = await res.json();
+                renderBoardList();
+            } catch(e) { console.error(e); }
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        async function loadBlog() {
+            document.getElementById('loading').style.display = 'block';
             try {
                 const res = await fetch(API_URL + "?action=getBlog");
                 blogData = await res.json();
-                renderList();
-            } catch (e) {
-                alert("불러오기 실패: " + e);
-            }
+                renderBlogList();
+            } catch(e) { console.error(e); }
+            document.getElementById('loading').style.display = 'none';
         }
 
-        function renderList() {
-            const container = document.getElementById('blog-list-container');
-            if (blogData.length === 0) {
-                container.innerHTML = "<p style='text-align:center'>아직 작성된 글이 없습니다.</p>";
-                return;
-            }
+        // --- 렌더링 (목록 그리기) ---
+        function renderBoardList() {
+            const tbody = document.getElementById('board-list');
+            if(boardData.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">게시글이 없습니다.</td></tr>'; return; }
             
-            let html = "";
-            blogData.forEach((post, idx) => {
-                // 썸네일이 없으면 기본 이미지
-                let thumb = post.thumbnail || "https://via.placeholder.com/400x200?text=No+Image";
-                html += `
-                    <div class="blog-card" onclick="viewPost(${idx})">
-                        <div class="blog-thumb"><img src="${thumb}"></div>
-                        <div class="blog-info">
-                            <div class="blog-title">${post.title}</div>
-                            <div class="blog-date">${post.date} · ${post.author}</div>
-                        </div>
-                    </div>`;
+            let html = '';
+            boardData.forEach((item, idx) => {
+                html += `<tr onclick="viewPost('board', ${idx})">
+                    <td class="col-no">${item.no}</td>
+                    <td>${item.title}</td>
+                    <td>${item.author}</td>
+                    <td class="col-date">${item.date}</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function renderBlogList() {
+            const container = document.getElementById('blog-list');
+            if(blogData.length === 0) { container.innerHTML = '<p style="padding:20px;">작성된 여행기가 없습니다.</p>'; return; }
+            
+            let html = '';
+            blogData.forEach((item, idx) => {
+                const thumb = item.thumbnail || 'https://via.placeholder.com/300x200?text=No+Image';
+                html += `<div class="blog-card" onclick="viewPost('blog', ${idx})">
+                    <div class="blog-thumb"><img src="${thumb}"></div>
+                    <div class="blog-info">
+                        <div class="blog-title">${item.title}</div>
+                        <div class="blog-meta">${item.date} · ${item.author}</div>
+                    </div>
+                </div>`;
             });
             container.innerHTML = html;
         }
 
-        // --- [상세 보기 기능] ---
-        function viewPost(idx) {
-            const post = blogData[idx];
-            document.getElementById('v-title').innerText = post.title;
-            document.getElementById('v-info').innerText = `${post.date} · ${post.author}`;
+        // --- 글쓰기 화면 설정 ---
+        function showWrite(type) {
+            document.getElementById('write-type').value = type;
+            document.getElementById('w-title').value = '';
+            document.getElementById('w-author').value = '';
+            document.getElementById('w-content').value = ''; // 게시판용 초기화
+            document.getElementById('blog-sections-area').innerHTML = ''; // 블로그용 초기화
             
-            // 본문 파싱 (JSON 문자열 -> 객체 배열)
-            let contentArr = [];
-            try {
-                contentArr = JSON.parse(post.content);
-            } catch(e) {
-                contentArr = [{text: post.content}]; // 예전 데이터 호환용
+            if(type === 'board') {
+                document.getElementById('write-title').innerText = "자유 게시판 글쓰기";
+                document.getElementById('editor-board').style.display = 'block';
+                document.getElementById('editor-blog').style.display = 'none';
+            } else {
+                document.getElementById('write-title').innerText = "여행 기록 남기기";
+                document.getElementById('editor-board').style.display = 'none';
+                document.getElementById('editor-blog').style.display = 'block';
+                addBlogSection(); // 블로그는 기본 입력칸 1개 추가
             }
-
-            let bodyHtml = "";
-            contentArr.forEach(section => {
-                if (section.imgUrl) {
-                    bodyHtml += `<img src="${section.imgUrl}">`;
-                }
-                if (section.text) {
-                    bodyHtml += `<p>${section.text}</p>`;
-                }
-            });
-            
-            document.getElementById('v-body').innerHTML = bodyHtml;
-            goPage('view');
-            window.scrollTo(0, 0);
+            showSection('sec-write');
         }
 
-        // --- [글쓰기 기능] ---
-        // 섹션(사진+글 세트) 추가하기
-        function addSection() {
+        // 블로그용 입력칸 추가 함수
+        function addBlogSection() {
             const div = document.createElement('div');
-            div.className = 'write-section';
+            div.className = 'blog-section';
             div.innerHTML = `
-                <h4>📷 사진 및 내용</h4>
-                <input type="file" class="file-input" accept="image/*">
-                <textarea placeholder="이 사진에 대한 설명을 적어주세요..."></textarea>
-                <button onclick="this.parentElement.remove()" style="color:red; border:none; background:none; cursor:pointer; float:right;">🗑️ 삭제</button>
-                <div style="clear:both"></div>
+                <div style="margin-bottom:5px; font-weight:bold;">📷 사진 및 설명</div>
+                <input type="file" class="form-control" accept="image/*" style="margin-bottom:5px;">
+                <textarea class="form-control" placeholder="사진에 대한 설명을 적어주세요." style="height:80px;"></textarea>
+                <button onclick="this.parentElement.remove()" style="float:right; margin-top:5px; border:none; background:none; color:red; cursor:pointer;">삭제</button>
+                <div style="clear:both;"></div>
             `;
-            document.getElementById('editor-area').appendChild(div);
+            document.getElementById('blog-sections-area').appendChild(div);
         }
 
-        async function saveBlog() {
+        // --- 글 저장하기 (핵심) ---
+        async function submitPost() {
+            const type = document.getElementById('write-type').value;
             const title = document.getElementById('w-title').value;
             const author = document.getElementById('w-author').value;
-            if (!title || !author) return alert("제목과 작성자를 입력해주세요.");
+            
+            if(!title || !author) return alert("제목과 작성자를 입력해주세요.");
 
-            // 로딩 시작
-            document.getElementById('loader').style.display = 'block';
+            document.getElementById('loading').style.display = 'block';
 
-            const sections = document.querySelectorAll('.write-section');
-            let contentData = [];
-            let thumbnailUrl = "";
+            let payload = {
+                title: title,
+                author: author
+            };
 
-            // 각 섹션을 순회하며 이미지 업로드 및 데이터 구성
-            for (let i = 0; i < sections.length; i++) {
-                const sec = sections[i];
-                const fileInput = sec.querySelector('input[type="file"]');
-                const textVal = sec.querySelector('textarea').value;
-                let imgUrl = "";
+            if(type === 'board') {
+                // [1] 게시판 저장
+                payload.action = 'savePost';
+                payload.content = document.getElementById('w-content').value;
+                await sendData(payload);
+            } else {
+                // [2] 블로그 저장 (사진 업로드 포함)
+                const sections = document.querySelectorAll('.blog-section');
+                let contentList = [];
+                let firstThumb = "";
 
-                // 이미지가 있으면 업로드 수행
-                if (fileInput.files.length > 0) {
-                    try {
-                        imgUrl = await uploadFile(fileInput.files[0]);
-                        // 첫 번째 이미지를 썸네일로 사용
-                        if (!thumbnailUrl) thumbnailUrl = imgUrl; 
-                    } catch (e) {
-                        console.error("이미지 업로드 실패", e);
+                for(let sec of sections) {
+                    const fileInput = sec.querySelector('input[type=file]');
+                    const text = sec.querySelector('textarea').value;
+                    let imgUrl = "";
+
+                    if(fileInput.files.length > 0) {
+                        try {
+                            // 사진을 먼저 서버로 보내고 URL을 받아옴
+                            imgUrl = await uploadFile(fileInput.files[0]);
+                            if(!firstThumb) firstThumb = imgUrl; // 첫 사진을 썸네일로
+                        } catch(e) { console.error(e); }
+                    }
+                    if(imgUrl || text) {
+                        contentList.push({ imgUrl: imgUrl, text: text });
                     }
                 }
 
-                if (imgUrl || textVal) {
-                    contentData.push({
-                        imgUrl: imgUrl,
-                        text: textVal
-                    });
-                }
-            }
-
-            if (contentData.length === 0) {
-                document.getElementById('loader').style.display = 'none';
-                return alert("내용을 입력해주세요.");
-            }
-
-            // 최종 데이터 전송
-            const payload = {
-                action: 'saveBlog',
-                title: title,
-                author: author,
-                content: JSON.stringify(contentData), // 배열을 문자열로 변환해 저장
-                thumbnail: thumbnailUrl
-            };
-
-            try {
-                await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(payload)
-                });
-                alert("발행되었습니다!");
-                location.reload(); // 새로고침
-            } catch (e) {
-                alert("저장 실패: " + e);
-                document.getElementById('loader').style.display = 'none';
+                payload.action = 'saveBlog';
+                payload.content = JSON.stringify(contentList); // JSON 문자열로 변환
+                payload.thumbnail = firstThumb;
+                await sendData(payload);
             }
         }
 
-        // 이미지 파일 1개를 서버로 보내고 URL을 받아오는 함수
+        // 데이터 전송 도우미
+        async function sendData(data) {
+            try {
+                await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
+                alert("등록되었습니다!");
+                switchTab(document.getElementById('write-type').value); // 목록으로 복귀
+            } catch(e) {
+                alert("오류 발생: " + e);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // 파일 업로드 도우미
         function uploadFile(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = async function(e) {
-                    const rawData = e.target.result; // base64 string
-                    try {
-                        const res = await fetch(API_URL, {
-                            method: 'POST',
-                            body: JSON.stringify({
-                                action: 'uploadImage',
-                                fileName: file.name,
-                                mimeType: file.type,
-                                fileData: rawData
-                            })
-                        });
-                        const result = await res.json();
-                        if (result.success) resolve(result.url);
-                        else reject(result.message);
-                    } catch (err) {
-                        reject(err);
-                    }
+                reader.onload = async (e) => {
+                    const res = await fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'uploadImage',
+                            fileName: file.name,
+                            mimeType: file.type,
+                            fileData: e.target.result
+                        })
+                    });
+                    const json = await res.json();
+                    if(json.success) resolve(json.url);
+                    else reject(json.message);
                 };
+                reader.readAsDataURL(file);
             });
+        }
+
+        // --- 상세 보기 ---
+        function viewPost(type, idx) {
+            const data = (type === 'board') ? boardData[idx] : blogData[idx];
+            
+            document.getElementById('v-title').innerText = data.title;
+            document.getElementById('v-meta').innerText = `작성자: ${data.author} | 날짜: ${data.date}`;
+            
+            const body = document.getElementById('v-body');
+            
+            if(type === 'board') {
+                // 게시판: 단순 텍스트 (줄바꿈 처리)
+                body.innerHTML = `<p>${data.content.replace(/\n/g, '<br>')}</p>`;
+            } else {
+                // 블로그: 사진+글 렌더링
+                let sections = [];
+                try { sections = JSON.parse(data.content); } catch(e) { sections = [{text: data.content}]; }
+                
+                let html = '';
+                sections.forEach(sec => {
+                    if(sec.imgUrl) html += `<img src="${sec.imgUrl}">`;
+                    if(sec.text) html += `<p>${sec.text}</p>`;
+                });
+                body.innerHTML = html;
+            }
+            
+            showSection('sec-view');
+            window.scrollTo(0,0);
+        }
+
+        function closeView() {
+            // 현재 활성화된 탭의 목록 화면으로 돌아가기
+            const currentTab = document.querySelector('.nav-link.active').innerText.includes('게시판') ? 'board' : 'blog';
+            showSection('sec-' + currentTab);
         }
     </script>
 </body>
