@@ -9,13 +9,13 @@
         * { box-sizing: border-box; }
         body { font-family: 'Apple SD Gothic Neo', sans-serif; margin: 0; background: var(--bg); color: var(--text); }
 
-        /* [네비게이션 헤더] */
+        /* [네비게이션] */
         header { background: white; padding: 0 20px; height: 60px; display: flex; align-items: center; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .logo { font-weight: bold; font-size: 1.2rem; margin-right: auto; color: var(--primary); }
         .nav-link { margin-left: 20px; cursor: pointer; color: #666; font-weight: bold; padding: 18px 0; border-bottom: 3px solid transparent; transition: 0.3s; }
         .nav-link:hover, .nav-link.active { color: var(--primary); border-bottom-color: var(--primary); }
 
-        /* [공통 레이아웃] */
+        /* [레이아웃] */
         .container { max-width: 900px; margin: 30px auto; padding: 0 20px; min-height: 80vh; }
         .section { display: none; animation: fadeIn 0.3s; }
         .section.active { display: block; }
@@ -25,9 +25,7 @@
         .btn { background: var(--primary); color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 0.95rem; }
         .btn:hover { opacity: 0.9; }
 
-        /* ---------------------------------------------------
-           [탭 1] 자유 게시판 스타일 (표 형태)
-        --------------------------------------------------- */
+        /* [게시판 스타일] */
         .board-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .board-table th { background: #f9f9f9; padding: 12px; text-align: left; font-weight: 600; border-bottom: 1px solid #eee; }
         .board-table td { padding: 12px; border-bottom: 1px solid #eee; }
@@ -35,9 +33,7 @@
         .col-no { width: 60px; text-align: center; }
         .col-date { width: 120px; color: #888; font-size: 0.9rem; text-align: center; }
 
-        /* ---------------------------------------------------
-           [탭 2] 여행 블로그 스타일 (카드 형태)
-        --------------------------------------------------- */
+        /* [블로그 스타일] */
         .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         .blog-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); transition: 0.3s; cursor: pointer; display: flex; flex-direction: column; }
         .blog-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
@@ -48,17 +44,15 @@
         .blog-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 8px; color: #333; }
         .blog-meta { margin-top: auto; font-size: 0.85rem; color: #999; }
 
-        /* [글쓰기/상세보기 화면 공통] */
+        /* [입력폼/상세보기] */
         .write-box, .view-box { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .input-group { margin-bottom: 15px; }
         .input-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
         .form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 1rem; }
         textarea.form-control { height: 150px; resize: vertical; }
         
-        /* 블로그 글쓰기 전용 (동적 추가 영역) */
         .blog-section { border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-bottom: 10px; background: #fafafa; }
         
-        /* 상세 보기 내용 */
         .view-content img { max-width: 100%; border-radius: 8px; margin: 15px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .view-content p { line-height: 1.7; white-space: pre-wrap; margin-bottom: 20px; }
         .view-header { border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
@@ -105,7 +99,8 @@
                 <button class="btn" style="background:#888" onclick="history.back()">취소</button>
             </div>
             <div class="write-box">
-                <input type="hidden" id="write-type"> <div class="input-group">
+                <input type="hidden" id="write-type">
+                <div class="input-group">
                     <input type="text" id="w-title" class="form-control" placeholder="제목을 입력하세요">
                 </div>
                 <div class="input-group">
@@ -137,19 +132,16 @@
                 <div id="v-body" class="view-content">내용</div>
             </div>
         </div>
-
     </div>
 
     <script>
-        // ★★★ 배포된 앱스 스크립트 주소를 여기에 꼭 넣으세요! ★★★
+        // ★★★ 본인의 배포 URL을 넣어주세요 ★★★
         const API_URL = "https://script.google.com/macros/s/AKfycbyOjYEtAlCm8drpFjoIfNanRaJfHWdWkS3nQHmXLXGVQivqaNWz776NqfpVB4B4jGlH9A/exec";
 
         let boardData = [];
         let blogData = [];
 
-        window.onload = function() {
-            switchTab('board');
-        };
+        window.onload = function() { switchTab('board'); };
 
         function switchTab(type) {
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
@@ -157,7 +149,6 @@
             else document.querySelector('.nav-link').classList.add('active');
             
             showSection('sec-' + type);
-            
             if(type === 'board') loadBoard();
             if(type === 'blog') loadBlog();
         }
@@ -167,11 +158,9 @@
             document.getElementById(id).classList.add('active');
         }
 
-        // --- 데이터 불러오기 (캐시 방지 적용됨) ---
         async function loadBoard() {
             document.getElementById('loading').style.display = 'block';
             try {
-                // &t=Date.now()를 추가하여 매번 새로운 데이터를 가져오게 함
                 const res = await fetch(API_URL + "?action=getPosts&t=" + Date.now());
                 boardData = await res.json();
                 renderBoardList();
@@ -182,7 +171,6 @@
         async function loadBlog() {
             document.getElementById('loading').style.display = 'block';
             try {
-                // &t=Date.now()를 추가하여 매번 새로운 데이터를 가져오게 함
                 const res = await fetch(API_URL + "?action=getBlog&t=" + Date.now());
                 blogData = await res.json();
                 renderBlogList();
@@ -193,15 +181,9 @@
         function renderBoardList() {
             const tbody = document.getElementById('board-list');
             if(boardData.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">게시글이 없습니다.</td></tr>'; return; }
-            
             let html = '';
             boardData.forEach((item, idx) => {
-                html += `<tr onclick="viewPost('board', ${idx})">
-                    <td class="col-no">${item.no}</td>
-                    <td>${item.title}</td>
-                    <td>${item.author}</td>
-                    <td class="col-date">${item.date}</td>
-                </tr>`;
+                html += `<tr onclick="viewPost('board', ${idx})"><td class="col-no">${item.no}</td><td>${item.title}</td><td>${item.author}</td><td class="col-date">${item.date}</td></tr>`;
             });
             tbody.innerHTML = html;
         }
@@ -209,17 +191,10 @@
         function renderBlogList() {
             const container = document.getElementById('blog-list');
             if(blogData.length === 0) { container.innerHTML = '<p style="padding:20px;">작성된 여행기가 없습니다.</p>'; return; }
-            
             let html = '';
             blogData.forEach((item, idx) => {
                 const thumb = item.thumbnail || 'https://via.placeholder.com/300x200?text=No+Image';
-                html += `<div class="blog-card" onclick="viewPost('blog', ${idx})">
-                    <div class="blog-thumb"><img src="${thumb}"></div>
-                    <div class="blog-info">
-                        <div class="blog-title">${item.title}</div>
-                        <div class="blog-meta">${item.date} · ${item.author}</div>
-                    </div>
-                </div>`;
+                html += `<div class="blog-card" onclick="viewPost('blog', ${idx})"><div class="blog-thumb"><img src="${thumb}"></div><div class="blog-info"><div class="blog-title">${item.title}</div><div class="blog-meta">${item.date} · ${item.author}</div></div></div>`;
             });
             container.innerHTML = html;
         }
@@ -247,23 +222,17 @@
         function addBlogSection() {
             const div = document.createElement('div');
             div.className = 'blog-section';
-            div.innerHTML = `
-                <div style="margin-bottom:5px; font-weight:bold;">📷 사진 및 설명</div>
-                <input type="file" class="form-control" accept="image/*" style="margin-bottom:5px;">
-                <textarea class="form-control" placeholder="사진에 대한 설명을 적어주세요." style="height:80px;"></textarea>
-                <button onclick="this.parentElement.remove()" style="float:right; margin-top:5px; border:none; background:none; color:red; cursor:pointer;">삭제</button>
-                <div style="clear:both;"></div>
-            `;
+            div.innerHTML = `<div style="margin-bottom:5px; font-weight:bold;">📷 사진 및 설명</div><input type="file" class="form-control" accept="image/*" style="margin-bottom:5px;"><textarea class="form-control" placeholder="사진에 대한 설명을 적어주세요." style="height:80px;"></textarea><button onclick="this.parentElement.remove()" style="float:right; margin-top:5px; border:none; background:none; color:red; cursor:pointer;">삭제</button><div style="clear:both;"></div>`;
             document.getElementById('blog-sections-area').appendChild(div);
         }
 
+        // ★★★ [글 저장하기: 파일명 변경 로직 포함] ★★★
         async function submitPost() {
             const type = document.getElementById('write-type').value;
             const title = document.getElementById('w-title').value;
             const author = document.getElementById('w-author').value;
             
             if(!title || !author) return alert("제목과 작성자를 입력해주세요.");
-
             document.getElementById('loading').style.display = 'block';
 
             let payload = { title: title, author: author };
@@ -276,6 +245,7 @@
                 const sections = document.querySelectorAll('.blog-section');
                 let contentList = [];
                 let firstThumb = "";
+                let imgCount = 1; // 이미지 번호 매기기용
 
                 for(let sec of sections) {
                     const fileInput = sec.querySelector('input[type=file]');
@@ -284,9 +254,15 @@
 
                     if(fileInput.files.length > 0) {
                         try {
-                            // 압축된 이미지 업로드
-                            imgUrl = await uploadFile(fileInput.files[0]);
+                            // ★ 핵심: 파일명을 "제목_1.jpg", "제목_2.jpg"로 생성
+                            const originalFile = fileInput.files[0];
+                            const newFileName = `${title}_${imgCount}.jpg`; 
+                            
+                            // 변경된 이름을 uploadFile 함수로 전달
+                            imgUrl = await uploadFile(originalFile, newFileName);
+                            
                             if(!firstThumb) firstThumb = imgUrl;
+                            imgCount++; 
                         } catch(e) { console.error(e); }
                     }
                     if(imgUrl || text) {
@@ -305,21 +281,16 @@
             try {
                 await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
                 alert("등록되었습니다!");
-                // 타입에 맞는 탭으로 이동 및 새로고침
-                const returnType = document.getElementById('write-type').value;
-                switchTab(returnType); 
-            } catch(e) {
-                alert("오류 발생: " + e);
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-            }
+                switchTab(document.getElementById('write-type').value);
+            } catch(e) { alert("오류 발생: " + e); } 
+            finally { document.getElementById('loading').style.display = 'none'; }
         }
 
-        // ★★★ [이미지 압축 및 업로드 함수] ★★★
-        function uploadFile(file) {
+        // ★★★ [이미지 압축 및 이름 변경 업로드] ★★★
+        function uploadFile(file, newName) {
             return new Promise((resolve, reject) => {
-                const MAX_WIDTH = 1024; // 이미지 최대 너비
-                const QUALITY = 0.7;    // 화질 70%
+                const MAX_WIDTH = 1024; 
+                const QUALITY = 0.7;    
 
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -340,15 +311,14 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-
                         const compressedDataUrl = canvas.toDataURL('image/jpeg', QUALITY);
 
-                        // 압축된 데이터 전송
+                        // 압축된 데이터 전송 (newName 사용)
                         fetch(API_URL, {
                             method: 'POST',
                             body: JSON.stringify({
                                 action: 'uploadImage',
-                                fileName: file.name,
+                                fileName: newName || file.name, // ★ 여기서 바뀐 이름 전송
                                 mimeType: 'image/jpeg',
                                 fileData: compressedDataUrl
                             })
@@ -368,8 +338,8 @@
             const data = (type === 'board') ? boardData[idx] : blogData[idx];
             document.getElementById('v-title').innerText = data.title;
             document.getElementById('v-meta').innerText = `작성자: ${data.author} | 날짜: ${data.date}`;
-            
             const body = document.getElementById('v-body');
+            
             if(type === 'board') {
                 body.innerHTML = `<p>${data.content.replace(/\n/g, '<br>')}</p>`;
             } else {
