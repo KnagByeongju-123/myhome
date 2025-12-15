@@ -370,6 +370,26 @@
             padding-bottom: 20px;
             border-bottom: 2px solid #f0f0f0;
         }
+        
+        /* API 설정 알림 */
+        .api-notice {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .api-notice strong {
+            color: #856404;
+        }
+        .api-notice code {
+            background: #fff;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #d63384;
+        }
+        
         .input-group {
             margin-bottom: 20px;
         }
@@ -520,6 +540,12 @@
     </style>
 </head>
 <body>
+    <!-- API 설정 알림 -->
+    <div class="api-notice" id="api-notice" style="margin: 20px; display: none;">
+        <strong>⚠️ 중요:</strong> <code>API_URL</code>을 Google Apps Script 배포 URL로 변경해주세요!<br>
+        현재 URL: <code id="current-api-url"></code>
+    </div>
+
     <header>
         <div class="logo" onclick="switchTab('home')">✨ 만물상</div>
         <div class="nav-link" onclick="switchTab('board')">📝 자유게시판</div>
@@ -674,13 +700,20 @@
     </div>
 
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbz8DhY9J_nXh9XhwSUjmZqhzlcZj3lzzTHJKsNIqT8nFiHnJgPYsjGHj1LXBQ6sKo-F/exec';
+        // ⚠️ 여기에 Google Apps Script 웹앱 배포 URL을 입력하세요!
+        const API_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
         
         let boardData = [];
         let blogData = [];
         let knowledgeData = [];
 
         window.onload = function() {
+            // API URL 확인
+            if (API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                document.getElementById('api-notice').style.display = 'block';
+                document.getElementById('current-api-url').innerText = API_URL;
+            }
+            
             loadAllData();
         }
 
@@ -695,6 +728,9 @@
                 updateStats();
             } catch(e) {
                 console.error('데이터 로딩 오류:', e);
+                if (API_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') {
+                    alert('⚠️ API_URL을 설정해주세요!\n\nGoogle Apps Script를 배포한 후\nHTML 파일의 API_URL 변수를 수정하세요.');
+                }
             } finally {
                 document.getElementById('loading').style.display = 'none';
             }
@@ -938,11 +974,19 @@
 
         async function sendData(data) {
             try {
+                console.log('📤 전송 데이터:', data);
+                console.log('🌐 API URL:', API_URL);
+                
                 const res = await fetch(API_URL, { 
-                    method: 'POST', 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify(data) 
                 });
+                
                 const result = await res.json();
+                console.log('📥 응답 데이터:', result);
                 
                 if(result.success) {
                     alert("✅ 등록되었습니다!");
@@ -951,7 +995,8 @@
                     alert("❌ 등록 실패: " + (result.message || "알 수 없는 오류"));
                 }
             } catch(e) { 
-                alert("❌ 오류 발생: " + e); 
+                console.error('❌ 에러 상세:', e);
+                alert(`❌ 오류 발생\n\n${e.message}\n\n해결 방법:\n1. API_URL이 올바른지 확인\n2. Google Apps Script 배포 확인\n3. 브라우저 콘솔(F12) 확인`); 
             } finally { 
                 document.getElementById('loading').style.display = 'none'; 
             }
@@ -985,6 +1030,9 @@
 
                         fetch(API_URL, {
                             method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
                             body: JSON.stringify({
                                 action: 'uploadImage',
                                 fileName: newName || file.name,
@@ -994,10 +1042,14 @@
                         })
                         .then(res => res.json())
                         .then(json => {
+                            console.log('이미지 업로드 응답:', json);
                             if(json.success) resolve(json.url);
                             else reject(json.message || "업로드 실패");
                         })
-                        .catch(err => reject(err));
+                        .catch(err => {
+                            console.error('이미지 업로드 에러:', err);
+                            reject(err);
+                        });
                     }
                 };
             });
