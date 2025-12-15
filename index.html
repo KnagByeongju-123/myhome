@@ -141,27 +141,23 @@
     </div>
 
     <script>
-        // ★★★ 배포 주소 확인 (Code.gs는 그대로 두셨으면 주소도 그대로입니다) ★★★
+        // ★★★ 배포된 앱스 스크립트 주소를 여기에 꼭 넣으세요! ★★★
         const API_URL = "https://script.google.com/macros/s/AKfycbyOjYEtAlCm8drpFjoIfNanRaJfHWdWkS3nQHmXLXGVQivqaNWz776NqfpVB4B4jGlH9A/exec";
 
         let boardData = [];
         let blogData = [];
 
-        // 초기 로드
         window.onload = function() {
-            switchTab('board'); // 기본은 게시판
+            switchTab('board');
         };
 
-        // 탭 전환
         function switchTab(type) {
-            // 메뉴 스타일 활성화
             document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-            event && event.target ? event.target.classList.add('active') : document.querySelector('.nav-link').classList.add('active');
+            if(event && event.target) event.target.classList.add('active');
+            else document.querySelector('.nav-link').classList.add('active');
             
-            // 섹션 표시
             showSection('sec-' + type);
             
-            // 데이터 로드
             if(type === 'board') loadBoard();
             if(type === 'blog') loadBlog();
         }
@@ -171,11 +167,12 @@
             document.getElementById(id).classList.add('active');
         }
 
-        // --- 데이터 불러오기 ---
+        // --- 데이터 불러오기 (캐시 방지 적용됨) ---
         async function loadBoard() {
             document.getElementById('loading').style.display = 'block';
             try {
-                const res = await fetch(API_URL + "?action=getPosts");
+                // &t=Date.now()를 추가하여 매번 새로운 데이터를 가져오게 함
+                const res = await fetch(API_URL + "?action=getPosts&t=" + Date.now());
                 boardData = await res.json();
                 renderBoardList();
             } catch(e) { console.error(e); }
@@ -185,14 +182,14 @@
         async function loadBlog() {
             document.getElementById('loading').style.display = 'block';
             try {
-                const res = await fetch(API_URL + "?action=getBlog");
+                // &t=Date.now()를 추가하여 매번 새로운 데이터를 가져오게 함
+                const res = await fetch(API_URL + "?action=getBlog&t=" + Date.now());
                 blogData = await res.json();
                 renderBlogList();
             } catch(e) { console.error(e); }
             document.getElementById('loading').style.display = 'none';
         }
 
-        // --- 렌더링 (목록 그리기) ---
         function renderBoardList() {
             const tbody = document.getElementById('board-list');
             if(boardData.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px;">게시글이 없습니다.</td></tr>'; return; }
@@ -227,13 +224,12 @@
             container.innerHTML = html;
         }
 
-        // --- 글쓰기 화면 설정 ---
         function showWrite(type) {
             document.getElementById('write-type').value = type;
             document.getElementById('w-title').value = '';
             document.getElementById('w-author').value = '';
-            document.getElementById('w-content').value = ''; // 게시판용 초기화
-            document.getElementById('blog-sections-area').innerHTML = ''; // 블로그용 초기화
+            document.getElementById('w-content').value = '';
+            document.getElementById('blog-sections-area').innerHTML = '';
             
             if(type === 'board') {
                 document.getElementById('write-title').innerText = "자유 게시판 글쓰기";
@@ -243,12 +239,11 @@
                 document.getElementById('write-title').innerText = "여행 기록 남기기";
                 document.getElementById('editor-board').style.display = 'none';
                 document.getElementById('editor-blog').style.display = 'block';
-                addBlogSection(); // 블로그는 기본 입력칸 1개 추가
+                addBlogSection();
             }
             showSection('sec-write');
         }
 
-        // 블로그용 입력칸 추가 함수
         function addBlogSection() {
             const div = document.createElement('div');
             div.className = 'blog-section';
@@ -262,7 +257,6 @@
             document.getElementById('blog-sections-area').appendChild(div);
         }
 
-        // --- 글 저장하기 (핵심) ---
         async function submitPost() {
             const type = document.getElementById('write-type').value;
             const title = document.getElementById('w-title').value;
@@ -272,18 +266,13 @@
 
             document.getElementById('loading').style.display = 'block';
 
-            let payload = {
-                title: title,
-                author: author
-            };
+            let payload = { title: title, author: author };
 
             if(type === 'board') {
-                // [1] 게시판 저장
                 payload.action = 'savePost';
                 payload.content = document.getElementById('w-content').value;
                 await sendData(payload);
             } else {
-                // [2] 블로그 저장 (사진 업로드 포함)
                 const sections = document.querySelectorAll('.blog-section');
                 let contentList = [];
                 let firstThumb = "";
@@ -295,9 +284,9 @@
 
                     if(fileInput.files.length > 0) {
                         try {
-                            // 사진을 먼저 서버로 보내고 URL을 받아옴
+                            // 압축된 이미지 업로드
                             imgUrl = await uploadFile(fileInput.files[0]);
-                            if(!firstThumb) firstThumb = imgUrl; // 첫 사진을 썸네일로
+                            if(!firstThumb) firstThumb = imgUrl;
                         } catch(e) { console.error(e); }
                     }
                     if(imgUrl || text) {
@@ -306,18 +295,19 @@
                 }
 
                 payload.action = 'saveBlog';
-                payload.content = JSON.stringify(contentList); // JSON 문자열로 변환
+                payload.content = JSON.stringify(contentList);
                 payload.thumbnail = firstThumb;
                 await sendData(payload);
             }
         }
 
-        // 데이터 전송 도우미
         async function sendData(data) {
             try {
                 await fetch(API_URL, { method: 'POST', body: JSON.stringify(data) });
                 alert("등록되었습니다!");
-                switchTab(document.getElementById('write-type').value); // 목록으로 복귀
+                // 타입에 맞는 탭으로 이동 및 새로고침
+                const returnType = document.getElementById('write-type').value;
+                switchTab(returnType); 
             } catch(e) {
                 alert("오류 발생: " + e);
             } finally {
@@ -325,26 +315,22 @@
             }
         }
 
-        // [수정된 파일 업로드 함수] : 이미지 압축 기능 추가
+        // ★★★ [이미지 압축 및 업로드 함수] ★★★
         function uploadFile(file) {
             return new Promise((resolve, reject) => {
-                // 1. 이미지 압축 설정
-                const MAX_WIDTH = 1024; // 최대 너비 (이보다 크면 줄임)
-                const QUALITY = 0.7;    // 화질 70% (웹용으로 적절, 용량 대폭 감소)
+                const MAX_WIDTH = 1024; // 이미지 최대 너비
+                const QUALITY = 0.7;    // 화질 70%
 
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = function(e) {
                     const img = new Image();
                     img.src = e.target.result;
-                    
-                    img.onload = async function() {
-                        // 2. 캔버스를 이용해 리사이징(크기 조절)
+                    img.onload = function() {
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
 
-                        // 비율 유지하면서 크기 줄이기
                         if (width > MAX_WIDTH) {
                             height *= MAX_WIDTH / width;
                             width = MAX_WIDTH;
@@ -352,53 +338,43 @@
 
                         canvas.width = width;
                         canvas.height = height;
-                        
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
 
-                        // 3. 압축된 데이터 얻기 (JPEG 변환)
                         const compressedDataUrl = canvas.toDataURL('image/jpeg', QUALITY);
 
-                        // 4. 서버로 전송
-                        try {
-                            const res = await fetch(API_URL, {
-                                method: 'POST',
-                                body: JSON.stringify({
-                                    action: 'uploadImage',
-                                    fileName: file.name, // 원본 파일명 유지
-                                    mimeType: 'image/jpeg', // 무조건 jpg로 변환됨
-                                    fileData: compressedDataUrl
-                                })
-                            });
-                            const json = await res.json();
+                        // 압축된 데이터 전송
+                        fetch(API_URL, {
+                            method: 'POST',
+                            body: JSON.stringify({
+                                action: 'uploadImage',
+                                fileName: file.name,
+                                mimeType: 'image/jpeg',
+                                fileData: compressedDataUrl
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(json => {
                             if(json.success) resolve(json.url);
                             else reject(json.message);
-                        } catch (err) {
-                            reject(err);
-                        }
+                        })
+                        .catch(err => reject(err));
                     }
                 };
-                reader.onerror = error => reject(error);
             });
         }
-        
-        // --- 상세 보기 ---
+
         function viewPost(type, idx) {
             const data = (type === 'board') ? boardData[idx] : blogData[idx];
-            
             document.getElementById('v-title').innerText = data.title;
             document.getElementById('v-meta').innerText = `작성자: ${data.author} | 날짜: ${data.date}`;
             
             const body = document.getElementById('v-body');
-            
             if(type === 'board') {
-                // 게시판: 단순 텍스트 (줄바꿈 처리)
                 body.innerHTML = `<p>${data.content.replace(/\n/g, '<br>')}</p>`;
             } else {
-                // 블로그: 사진+글 렌더링
                 let sections = [];
                 try { sections = JSON.parse(data.content); } catch(e) { sections = [{text: data.content}]; }
-                
                 let html = '';
                 sections.forEach(sec => {
                     if(sec.imgUrl) html += `<img src="${sec.imgUrl}">`;
@@ -406,17 +382,14 @@
                 });
                 body.innerHTML = html;
             }
-            
             showSection('sec-view');
             window.scrollTo(0,0);
         }
 
         function closeView() {
-            // 현재 활성화된 탭의 목록 화면으로 돌아가기
             const currentTab = document.querySelector('.nav-link.active').innerText.includes('게시판') ? 'board' : 'blog';
             showSection('sec-' + currentTab);
         }
     </script>
 </body>
 </html>
-
